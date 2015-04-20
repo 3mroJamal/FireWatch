@@ -1,4 +1,3 @@
 # FireWatch
 Amr's Master Thesis Project
-My First Edit
-hahahha
+Summary of papers in "LiteraturePapers" is in the shared Google Folder
