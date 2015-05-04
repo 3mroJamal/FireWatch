@@ -6,7 +6,8 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     
     SuperPixelNumber = 2000;
     CompactnessFactor = 50;
-    Labels = SLICdemo(NormalizedGrayImage, SuperPixelNumber, CompactnessFactor);
+    [Labels numLabels] = SLICdemo(NormalizedGrayImage, SuperPixelNumber, CompactnessFactor);
+    Labels = Labels + 1;
     
     binaryMask = drawregionboundaries(Labels);    
     
@@ -20,4 +21,7 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     
     figure();
     imshow(MaskedImage);
+
+    featureNumber = 4;
+    featureMatrix = extractFeatures(NormalizedGrayImage, featureNumber,Labels, numLabels);
 end

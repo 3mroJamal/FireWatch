@@ -25,7 +25,7 @@
 % Default SuperPixelNumber is 500, Compactness Factor: 20
 function [labels, numlabels] = SLICdemo(GrayScaleImage, SuperPixelNumber, CompactnessFactor)
     [labels, numlabels] = slicmex(GrayScaleImage,SuperPixelNumber,CompactnessFactor);%numlabels is the same as number of superpixels
-    imagesc(labels);   
+    %% imagesc(labels);   
 end
 
 
