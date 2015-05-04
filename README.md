@@ -9,5 +9,6 @@ Code -> Project Code arranged in Modules
 	SLIC_DBSCAN -> Slow version of SLIC Algorithm implemented in Matlab. Only use the 
         drawregionboundaries.m function which draws te boundaries of superpixels
 
-	SLIC_C_Code -> SLIC C Code (fast version that I actually use)
+
+        SLIC_C_Code -> SLIC C Code (fast version that I actually use)
 	        	Found under http://ivrl.epfl.ch/supplementary_material/RK_SLICSuperpixels/index.html
