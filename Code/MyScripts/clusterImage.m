@@ -41,8 +41,6 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     figure();
     imshow(ClusterImage);
     
-    figure();
-    
     for clusterIdx = 1:clusterNumber
         currentClusterImage = uint8(zeros(size(NormalizedGrayImage)));
         
@@ -60,6 +58,9 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
         
         subplot(1, 2, 2);
         %%figure();
-        imhist(currentClusterImage);
+        neededPixels = currentClusterImage(currentClusterImage~=0);
+        size(unique(neededPixels))
+        %hist(neededPixels);
+        imhist(neededPixels);
     end
 end
