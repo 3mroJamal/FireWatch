@@ -6,7 +6,7 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     
     SuperPixelNumber = 2000;
     CompactnessFactor = 50;
-    [Labels numLabels] = SLICdemo(NormalizedGrayImage, SuperPixelNumber, CompactnessFactor);
+    [Labels, numLabels] = SLICdemo(NormalizedGrayImage, SuperPixelNumber, CompactnessFactor);
     Labels = Labels + 1;
     
     binaryMask = drawregionboundaries(Labels);    
@@ -22,6 +22,44 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     figure();
     imshow(MaskedImage);
 
-    featureNumber = 4;
+    featureNumber = 2;
     featureMatrix = extractFeatures(NormalizedGrayImage, featureNumber,Labels, numLabels);
+    
+    featureMatrix = normalizeFeatures(featureMatrix);
+    
+   
+    clusterNumber = 5;
+    clusterIndices = kmeans(featureMatrix', clusterNumber);
+    
+    ClusterImage = double(zeros(size(NormalizedGrayImage)));
+    
+    for i = 1:numLabels
+        ClusterImage(Labels == i) = clusterIndices(i)/clusterNumber;
+    end
+    
+    
+    figure();
+    imshow(ClusterImage);
+    
+    figure();
+    
+    for clusterIdx = 1:clusterNumber
+        currentClusterImage = uint8(zeros(size(NormalizedGrayImage)));
+        
+        for superPixelIdx = 1:numLabels
+            superPixelClusterIdx = clusterIndices(superPixelIdx);
+            if(superPixelClusterIdx == clusterIdx)
+                currentClusterImage(Labels == superPixelIdx) = NormalizedGrayImage(Labels == superPixelIdx);
+            end
+        end
+        figure();
+        subplot(1, 2, 1);
+        %%figure();
+        imshow(currentClusterImage);
+        %%title(clusterIdx);
+        
+        subplot(1, 2, 2);
+        %%figure();
+        imhist(currentClusterImage);
+    end
 end
