@@ -4,11 +4,11 @@ function [] = optFlow (I1,I2)
     I2 = normalizeImage(I2);
     
     figure();
-    imshow(I1);
+    imshow(adapthisteq(I1));
 
     
     figure();
-    imshow(I2);
+    imshow(adapthisteq(I2));
     
     opticalFlow = vision.OpticalFlow();
     opticalFlow.OutputValue = 'Horizontal and vertical components in complex form';
@@ -60,15 +60,38 @@ function [] = optFlow (I1,I2)
     imshow(maskedImage);
     
     
+    superpixelXMotion = zeros(1, numlabels);
+    superpixelYMotion = zeros(1, numlabels);
+    superPixelMotionMagnitude = zeros(1, numlabels);
     
     for superPixelIdx = 1:numlabels
         hold on
         neededPixels = (labels ==superPixelIdx);
         meanX = mean(rowsMatrix(neededPixels));
         meanY = mean(columnMatrix(neededPixels));
+          
         meanXMotion = mean(xPart(neededPixels));
         meanYMotion = mean(yPart(neededPixels));
+          
+        superpixelXMotion(superPixelIdx) = meanXMotion;
+        superpixelYMotion(superPixelIdx) = meanYMotion;
+      
         quiver(floor(meanY), floor(meanX), meanYMotion*100000, meanXMotion*100000);
     end
+    
+    figure();
+    hist(superpixelXMotion);
+    title('SUPERPIXEL X MOTION');
+    
+    figure();
+    hist(superpixelYMotion);
+    title('SUPERPIXEL Y MOTION');
+    
+    
+    superPixelMotionMagnitude = sqrt(superpixelXMotion.*superpixelXMotion + superpixelYMotion.*superpixelYMotion);
+    
+    figure();
+    hist(superPixelMotionMagnitude);
+    title('SUPERPIXEL MOTION MAG');
     
 end
