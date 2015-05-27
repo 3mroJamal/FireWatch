@@ -29,27 +29,31 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     
    
     clusterNumber = 5;
-    clusterIndices = kmeans(featureMatrix', clusterNumber);
+    SuperPixelClusterIndices = kmeans(featureMatrix', clusterNumber);
     
     ClusterImage = double(zeros(size(NormalizedGrayImage)));
     
     for i = 1:numLabels
-        ClusterImage(Labels == i) = clusterIndices(i)/clusterNumber;
+        ClusterImage(Labels == i) = SuperPixelClusterIndices(i);
     end
     
     
     figure();
-    imshow(ClusterImage);
+    ClusterImageNormalized = ClusterImage./clusterNumber;
+    imshow(ClusterImageNormalized);
+    
+    clusterMeans = zeros(clusterNumber);
+    clusterSTDs = zeros(clusterNumber);
     
     for clusterIdx = 1:clusterNumber
         currentClusterImage = uint8(zeros(size(NormalizedGrayImage)));
         
-        for superPixelIdx = 1:numLabels
-            superPixelClusterIdx = clusterIndices(superPixelIdx);
-            if(superPixelClusterIdx == clusterIdx)
-                currentClusterImage(Labels == superPixelIdx) = NormalizedGrayImage(Labels == superPixelIdx);
-            end
-        end
+        currentClusterImage(ClusterImage==clusterIdx) = NormalizedGrayImage(ClusterImage==clusterIdx);
+        
+        
+        figure();
+        imshow(currentClusterImage);
+        
         figure();
         subplot(1, 2, 1);
         %%figure();
@@ -59,8 +63,21 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
         subplot(1, 2, 2);
         %%figure();
         neededPixels = currentClusterImage(currentClusterImage~=0);
-        size(unique(neededPixels))
-        %hist(neededPixels);
         imhist(neededPixels);
+        
+        clusterMeans(clusterIdx) = mean(neededPixels);
+        clusterSTDs(clusterIdx) = std(double(neededPixels));
     end
+    
+    [sortedMeans, clustersCorrespondingToMeans] = sort(clusterMeans, 'descend');
+    clustersToInclude = 4;
+    brightestClusterIndices = clustersCorrespondingToMeans(1:clustersToInclude);
+    brightestClustersImage = uint8(zeros(size(NormalizedGrayImage)));
+    for i = 1:clustersToInclude
+        brightestClustersImage(ClusterImage == brightestClusterIndices(i)) = NormalizedGrayImage(ClusterImage == brightestClusterIndices(i));
+    end
+    
+    figure();
+    imshow(brightestClustersImage);
+    
 end
