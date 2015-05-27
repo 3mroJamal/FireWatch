@@ -1,6 +1,7 @@
-function [] = frameDiffForDirectory(dirName)
-  dirInfo = dir(dirName);
+function [] = frameDiffForDirectory(dirPath, tripletsCount)
+  dirInfo = dir(dirPath);
   
+  tripletsConsidered = 0;
   for i = 3:size(dirInfo)
       
       [pathstr,nameNoExt,ext] = fileparts(dirInfo(i).name);
@@ -9,8 +10,13 @@ function [] = frameDiffForDirectory(dirName)
       end
       
       
+      if (tripletsConsidered == tripletsCount)
+        break;
+      end
+      
       lastCharacter = nameNoExt(size(nameNoExt,2));
       if(lastCharacter == '0')
+          tripletsConsidered = tripletsConsidered+1;
           imZeroName = strcat(nameNoExt, ext);
           imOneName = nameNoExt;
           imOneName(size(imOneName,2)) = '1';
@@ -22,20 +28,11 @@ function [] = frameDiffForDirectory(dirName)
           
           % concat directory so that image can be read regardless what
           % current matlab directory is
-          imZero = imread(fullfile(dirName,imZeroName));
-          imOne = imread(fullfile(dirName,imOneName));
-          imTwo = imread(fullfile(dirName,imTwoName));
+          imZero = imread(fullfile(dirPath,imZeroName));
+          imOne = imread(fullfile(dirPath,imOneName));
+          imTwo = imread(fullfile(dirPath,imTwoName));
           
-          
-          %figure();
-          %imshow(normalizeImage(imZero));
-          %title('Normalized Image');
-          
-          
-          %figure();
-          %imshow(histeq(normalizeImage(imZero)));
-          %title('Histogram Equalization');
-          
+       
           normalizedImage = uint8(normalizeImage(imZero).*255);
           %figure();
           %imshow(normalizedImage);
@@ -73,9 +70,6 @@ function [] = frameDiffForDirectory(dirName)
           figure();
           imshow(dilatedDiff);
           title('dilated image');
-          
-          
-        
           
          
           
