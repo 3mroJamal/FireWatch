@@ -1,34 +1,34 @@
-function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
+% feature order in feature matrix
+% 1- mean intensity
+% 2- intensity SD
+% 3- mean X position
+% 4- mean Y position
+% 5- mean X motion
+% 6- mean Y motion
+% 7- X motion STD
+% 8- Y motion STD
+
+function [] = clusterImage(NormalizedGrayImage, useWhiteMask, clusterNumber, featuresToInclude)
     % useWhiteMask: determines the color of the mask
     %               White Masks are useful to visualzie details when
     %               forests are black. Black masks are useful to visualize
     %               superpixels of the smoke and the sky.
     
-    SuperPixelNumber = 2000;
-    CompactnessFactor = 50;
+    SuperPixelNumber = 500;
+    CompactnessFactor = 40;
     [Labels, numLabels] = SLICdemo(NormalizedGrayImage, SuperPixelNumber, CompactnessFactor);
-    Labels = Labels + 1;
     
-    binaryMask = drawregionboundaries(Labels);    
-    
-    MaskedImage = NormalizedGrayImage;
-    
-    if(useWhiteMask)
-        MaskedImage(binaryMask==1) = 255;
-    else
-        MaskedImage(binaryMask==1) = 0;
-    end
+    SuperpixelBoundaries =  drawSuperpixelBoundaries(NormalizedGrayImage, Labels, useWhiteMask);
     
     figure();
-    imshow(MaskedImage);
+    imshow(SuperpixelBoundaries);
 
-    featureNumber = 2;
-    featureMatrix = extractFeatures(NormalizedGrayImage, featureNumber,Labels, numLabels);
+    featureMatrix = extractFeatures(NormalizedGrayImage, Labels, numLabels);
     
     featureMatrix = normalizeFeatures(featureMatrix);
     
-   
-    clusterNumber = 5;
+    featureMatrix = featureMatrix(featuresToInclude>0, :);
+    
     SuperPixelClusterIndices = kmeans(featureMatrix', clusterNumber);
     
     ClusterImage = double(zeros(size(NormalizedGrayImage)));
@@ -70,14 +70,15 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask)
     end
     
     [sortedMeans, clustersCorrespondingToMeans] = sort(clusterMeans, 'descend');
-    clustersToInclude = 4;
-    brightestClusterIndices = clustersCorrespondingToMeans(1:clustersToInclude);
-    brightestClustersImage = uint8(zeros(size(NormalizedGrayImage)));
-    for i = 1:clustersToInclude
-        brightestClustersImage(ClusterImage == brightestClusterIndices(i)) = NormalizedGrayImage(ClusterImage == brightestClusterIndices(i));
-    end
     
-    figure();
-    imshow(brightestClustersImage);
+    %%clustersToInclude = 4;
+    %%brightestClusterIndices = clustersCorrespondingToMeans(1:clustersToInclude);
+    %%brightestClustersImage = uint8(zeros(size(NormalizedGrayImage)));
+    %%for i = 1:clustersToInclude
+    %%    brightestClustersImage(ClusterImage == brightestClusterIndices(i)) = NormalizedGrayImage(ClusterImage == brightestClusterIndices(i));
+    %%end
+    
+    %% figure();
+    %% imshow(brightestClustersImage);
     
 end

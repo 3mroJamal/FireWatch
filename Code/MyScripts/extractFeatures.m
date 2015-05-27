@@ -1,4 +1,4 @@
-% returns the feature matrix of an image where each column corresponf to a
+% returns the feature matrix of an image where each column corresponds to a
 % super pixel and each row correspond to a feature
 % Feature Indices: 
 % 1) Mean Intensity
@@ -6,8 +6,8 @@
 % 3) Mean x position
 % 4) Mean y postion
 
-function [featureMatrix] = extractFeatures(NormalizedGrayScaleImage, FeatureNumber, Labels, NumLabels)
-    featureMatrix = zeros(FeatureNumber, NumLabels);
+function [featureMatrix] = extractFeatures(NormalizedGrayScaleImage, Labels, NumLabels)
+    featureMatrix = zeros(4, NumLabels);
     
     [rows, columns] = size(NormalizedGrayScaleImage);
     
@@ -15,28 +15,21 @@ function [featureMatrix] = extractFeatures(NormalizedGrayScaleImage, FeatureNumb
         neededPixels = NormalizedGrayScaleImage(Labels == SuperPixelIdx);
         neededPixelsPositions = find(Labels == SuperPixelIdx);
         
-        if(FeatureNumber >=1)
-            meanOfNeededPixels = mean(neededPixels);
-            featureMatrix(1, SuperPixelIdx) = meanOfNeededPixels;
-        end
-        
-        if(FeatureNumber >=2)
-            stdOfNeededPixels = std(double(neededPixels));
-            featureMatrix(2, SuperPixelIdx) = stdOfNeededPixels;
-        end
+        meanOfNeededPixels = mean(neededPixels);
+        featureMatrix(1, SuperPixelIdx) = meanOfNeededPixels;
         
         
-        if(FeatureNumber >=3)
-            rowIdx = mod((neededPixelsPositions-1) ,rows) +1;
-            meanRow = mean(rowIdx);
-            featureMatrix(3, SuperPixelIdx) = meanRow;
-        end
-
-        if(FeatureNumber >=4)
-            colIdx = floor((neededPixelsPositions+1)/rows);
-            meanColumn = mean(colIdx);
-            featureMatrix(4, SuperPixelIdx) = meanColumn;
-        end
+        stdOfNeededPixels = std(double(neededPixels));
+        featureMatrix(2, SuperPixelIdx) = stdOfNeededPixels;
+        
+        rowIdx = mod((neededPixelsPositions-1) ,rows) +1;
+        meanRow = mean(rowIdx);
+        featureMatrix(3, SuperPixelIdx) = meanRow;
+        
+        colIdx = floor((neededPixelsPositions+1)/rows);
+        meanColumn = mean(colIdx);
+        featureMatrix(4, SuperPixelIdx) = meanColumn;
+     end
         
     end
     
@@ -55,4 +48,4 @@ function [featureMatrix] = extractFeatures(NormalizedGrayScaleImage, FeatureNumb
         text(featureMatrix(4,i), featureMatrix(3,i), 'h');
     end  
     %}
-end
+   %end
