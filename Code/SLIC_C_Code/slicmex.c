@@ -52,7 +52,7 @@ void rgbtolab(int* rin, int* gin, int* bin, int sz, double* lvec, double* avec, 
     double fx, fy, fz;
     double lval,aval,bval;
     
-    for(int i = 0; i < sz; i++)
+    for(i = 0; i < sz; i++)
     {
         sR = rin[i]; sG = gin[i]; sB = bin[i];
         R = sR/255.0;
@@ -268,9 +268,12 @@ void EnforceConnectivity(int* labels, int width, int height, int numSuperpixels,
     int* xvec = mxMalloc(sizeof(int)*sz);
 	int* yvec = mxMalloc(sizeof(int)*sz);
 	const int SUPSZ = sz/numSuperpixels;
+    int oindex;
+    int adjlabel;
+    
 	for( i = 0; i < sz; i++ ) nlabels[i] = -1;
-	int oindex = 0;
-	int adjlabel = 0;//adjacent label
+	oindex = 0;
+	adjlabel = 0;//adjacent label
     label = 0;
 	for( j = 0; j < height; j++ )
 	{
@@ -348,14 +351,8 @@ void EnforceConnectivity(int* labels, int width, int height, int numSuperpixels,
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[])
 {
-    if (nrhs < 1) {
-        mexErrMsgTxt("At least one argument is required.") ;
-    } else if(nrhs > 3) {
-        mexErrMsgTxt("Too many input arguments.");
-    }
-    if(nlhs!=2) {
-        mexErrMsgIdAndTxt("SLIC:nlhs","Two outputs required, a labels and the number of labels, i.e superpixels.");
-    }
+    
+    
     //---------------------------
     // Variable declarations
     //---------------------------
@@ -384,6 +381,16 @@ void mexFunction(int nlhs, mxArray *plhs[],
     //---------------------------
     int numelements   = mxGetNumberOfElements(prhs[0]) ;
     int numdims = mxGetNumberOfDimensions(prhs[0]) ;
+    
+    if (nrhs < 1) {
+        mexErrMsgTxt("At least one argument is required.") ;
+    } else if(nrhs > 3) {
+        mexErrMsgTxt("Too many input arguments.");
+    }
+    if(nlhs!=2) {
+        mexErrMsgIdAndTxt("SLIC:nlhs","Two outputs required, a labels and the number of labels, i.e superpixels.");
+    }
+    
     dims  = (int*)mxGetDimensions(prhs[0]) ;
     imgbytes  = (unsigned char*)mxGetData(prhs[0]) ;//mxGetData returns a void pointer, so cast it
     width = dims[1]; height = dims[0];//Note: first dimension provided is height and second is width
