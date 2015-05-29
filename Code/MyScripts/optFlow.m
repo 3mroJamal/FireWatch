@@ -1,7 +1,13 @@
 function [] = optFlow (I1,I2)
     
-    I1 = normalizeImage(I1);
-    I2 = normalizeImage(I2);
+    %% I1 = normalizeImage(I1)
+    %% I2 = normalizeImage(I2)
+    
+    I1 = double(uint8(normalizeImage(I1).*16))./16;
+    I2 =  double(uint8(normalizeImage(I2).*16))./16;
+    
+    figure();
+    imhist(I1);
     
     figure();
     imshow(adapthisteq(I1));
@@ -44,10 +50,6 @@ function [] = optFlow (I1,I2)
     [labels, numlabels] = SLICdemo(I1, 500, 40);
     
     superpixelBoundaries = drawSuperpixelBoundaries(I1, labels,0);
-   
-    
-    
-    
     
     
     rowsMatrix = zeros(size(I1));

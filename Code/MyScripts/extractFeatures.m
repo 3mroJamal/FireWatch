@@ -6,10 +6,12 @@
 % 3) Mean x position
 % 4) Mean y postion
 
-function [featureMatrix] = extractFeatures(NormalizedGrayScaleImage, Labels, NumLabels)
+function [featureMatrix] = extractFeatures(Image, Labels, NumLabels)
     featureMatrix = zeros(4, NumLabels);
     
-    [rows, columns] = size(NormalizedGrayScaleImage);
+    [rows, columns] = size(Image);
+    
+    NormalizedGrayScaleImage = uint8(normalizeImage(Image).*255);
     
     for SuperPixelIdx = 1:NumLabels
         neededPixels = NormalizedGrayScaleImage(Labels == SuperPixelIdx);

@@ -7,31 +7,77 @@
 % 6- mean Y motion
 % 7- X motion STD
 % 8- Y motion STD
+% 9- mean of diffImage
+% 10- std of diffImage
 
-function [] = clusterImage(NormalizedGrayImage, useWhiteMask, clusterNumber, featuresToInclude)
+function [] = clusterImage(Image, ImageTwo, useWhiteMask, clusterNumber, featuresToInclude)
     % useWhiteMask: determines the color of the mask
     %               White Masks are useful to visualzie details when
     %               forests are black. Black masks are useful to visualize
     %               superpixels of the smoke and the sky.
     
+    
+    normalizedImage = normalizeImage(Image);
+    grayscaleImage = uint8(normalizedImage.*255);
+    
     SuperPixelNumber = 500;
     CompactnessFactor = 40;
-    [Labels, numLabels] = SLICdemo(NormalizedGrayImage, SuperPixelNumber, CompactnessFactor);
+    [Labels, numLabels] = SLICdemo(grayscaleImage, SuperPixelNumber, CompactnessFactor);
     
-    SuperpixelBoundaries =  drawSuperpixelBoundaries(NormalizedGrayImage, Labels, useWhiteMask);
+    SuperpixelBoundaries =  drawSuperpixelBoundaries(grayscaleImage, Labels, useWhiteMask);
     
     figure();
     imshow(SuperpixelBoundaries);
+    title('Superpixels');
 
-    featureMatrix = extractFeatures(NormalizedGrayImage, Labels, numLabels);
+    colorFeatureMatrix = extractFeatures(grayscaleImage, Labels, numLabels);
+    
+    normalizedImageTwo = normalizeImage(ImageTwo);
+    motionFeatureMatrix = extractMotionFeatures(normalizedImage, normalizedImageTwo, Labels,numLabels);
+    
+    featureMatrix = [colorFeatureMatrix; motionFeatureMatrix];
+    
+    %% figure();
+    %% hist(featureMatrix(1,:));
+    %% title('Mean Intensity Hist');
+    
+    %% figure();
+    %% hist(featureMatrix(2,:));
+    %% title('Intensity STD Hist');
+    
+    %% figure();
+    %% hist(featureMatrix(3,:));
+    %% title('Mean X hist');
+    
+    %% figure();
+    %% hist(featureMatrix(4,:));
+    %% title('Mean Y hist');
+    
+    %% figure();
+    %% hist(featureMatrix(5,:));
+    %% title('X motion hist');
+    
+    %% figure();
+    %% hist(featureMatrix(6,:));
+    %% title('X motion STD hist');
+        
+    %% figure();
+    %% hist(featureMatrix(7,:));
+    %% title('Y motion hist');
+    
+    %% figure();
+    %% hist(featureMatrix(8,:));
+    %% title('Y motion STD hist');
+    
     
     featureMatrix = normalizeFeatures(featureMatrix);
     
     featureMatrix = featureMatrix(featuresToInclude>0, :);
-    
+        
     SuperPixelClusterIndices = kmeans(featureMatrix', clusterNumber);
     
-    ClusterImage = double(zeros(size(NormalizedGrayImage)));
+    % Each pixel has a label to which cluster does it belong
+    ClusterImage = double(zeros(size(Image)));
     
     for i = 1:numLabels
         ClusterImage(Labels == i) = SuperPixelClusterIndices(i);
@@ -41,35 +87,53 @@ function [] = clusterImage(NormalizedGrayImage, useWhiteMask, clusterNumber, fea
     figure();
     ClusterImageNormalized = ClusterImage./clusterNumber;
     imshow(ClusterImageNormalized);
+    title('Cluster Image');
     
     clusterMeans = zeros(clusterNumber);
     clusterSTDs = zeros(clusterNumber);
     
+    %% statistics per cluster
     for clusterIdx = 1:clusterNumber
-        currentClusterImage = uint8(zeros(size(NormalizedGrayImage)));
-        
-        currentClusterImage(ClusterImage==clusterIdx) = NormalizedGrayImage(ClusterImage==clusterIdx);
+        currentClusterImage = uint8(zeros(size(Image)));
+        currentClusterImage(ClusterImage==clusterIdx) = grayscaleImage(ClusterImage==clusterIdx);
         
         
         figure();
         imshow(currentClusterImage);
         
         figure();
-        subplot(1, 2, 1);
-        %%figure();
+        subplot(1, 3, 1);
         imshow(currentClusterImage);
-        %%title(clusterIdx);
         
-        subplot(1, 2, 2);
-        %%figure();
+        %% subplot(1, 2, 2);
         neededPixels = currentClusterImage(currentClusterImage~=0);
-        imhist(neededPixels);
+        %% imhist(neededPixels);
+        
         
         clusterMeans(clusterIdx) = mean(neededPixels);
         clusterSTDs(clusterIdx) = std(double(neededPixels));
+        
+        %% row vector with ones at superpixels belonging to current clusters
+        clusterSuperpixels = (SuperPixelClusterIndices' == clusterIdx);
+        
+        superpixelIntensities = featureMatrix(1, :);
+        clusterSuperpixelIntensities = superpixelIntensities(clusterSuperpixels);
+        
+        subplot(1,3,2);
+        hist(clusterSuperpixelIntensities);
+        title(' Histogram of Mean superpixels intensities');
+        
+        
+        superpixelSTD = featureMatrix(2,:);
+        clusterSuperpixelSTD = superpixelSTD(clusterSuperpixels);
+        
+        subplot(1,3,3);
+        hist(clusterSuperpixelSTD);
+        title('Hist of Superpixel STDs');
+        
     end
     
-    [sortedMeans, clustersCorrespondingToMeans] = sort(clusterMeans, 'descend');
+    %% [sortedMeans, clustersCorrespondingToMeans] = sort(clusterMeans, 'descend');
     
     %%clustersToInclude = 4;
     %%brightestClusterIndices = clustersCorrespondingToMeans(1:clustersToInclude);
