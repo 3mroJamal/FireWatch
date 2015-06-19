@@ -11,10 +11,18 @@ function [featureMatrix] = extractFeatures(Image, Labels, NumLabels)
     
     [rows, columns] = size(Image);
     
-    NormalizedGrayScaleImage = uint8(normalizeImage(Image).*255);
+    %% NormalizedGrayScaleImage = uint8(normalizeImage(Image).*255);
+   
+    normalizedImage = normalizeImage(Image);
+    %%figure();
+    %%imhist(normalizedImage);
+    %%title('Histogram Of Normalized Intensities');
+    
     
     for SuperPixelIdx = 1:NumLabels
-        neededPixels = NormalizedGrayScaleImage(Labels == SuperPixelIdx);
+        %% neededPixels = NormalizedGrayScaleImage(Labels == SuperPixelIdx);
+        
+        neededPixels = normalizedImage(Labels == SuperPixelIdx);
         neededPixelsPositions = find(Labels == SuperPixelIdx);
         
         meanOfNeededPixels = mean(neededPixels);

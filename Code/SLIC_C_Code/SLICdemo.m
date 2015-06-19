@@ -22,7 +22,10 @@
 %======================================================================
 
 
-% Default SuperPixelNumber is 500, Compactness Factor: 20
+% GrayScaleImage: Image of class uint8 (values in range [0,255])
+% Note: SLIC has better results when the grayscale Image is equalized using
+% adaptive histogram equalization technique
+% Default SuperPixelNumber is 500, Compactness Factor: 40
 function [labels, numlabels] = SLICdemo(GrayScaleImage, SuperPixelNumber, CompactnessFactor)
     [labels, numlabels] = slicmex(GrayScaleImage,SuperPixelNumber,CompactnessFactor);%numlabels is the same as number of superpixels
     %% imagesc(labels);

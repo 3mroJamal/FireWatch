@@ -1,20 +1,22 @@
 function [] = optFlow (I1,I2)
     
-    %% I1 = normalizeImage(I1)
-    %% I2 = normalizeImage(I2)
+    if(size(I1,3)>1)
+        I1 = rgb2gray(I1);
+    end
     
-    I1 = double(uint8(normalizeImage(I1).*16))./16;
-    I2 =  double(uint8(normalizeImage(I2).*16))./16;
     
+    if(size(I2,3)>1)
+        I2 = rgb2gray(I2);
+    end
+
+    I1 = normalizeImage(I1);
+    I2 = normalizeImage(I2);
+       
     figure();
-    imhist(I1);
-    
-    figure();
-    imshow(adapthisteq(I1));
-    
+    imshow((I1));
   
     figure();
-    imshow(adapthisteq(I2));
+    imshow((I2));
   
     
     opticalFlow = vision.OpticalFlow();
@@ -69,6 +71,8 @@ function [] = optFlow (I1,I2)
     superpixelXMotion = zeros(1, numlabels);
     superpixelYMotion = zeros(1, numlabels);
 
+    superpixelXMotionSTD = zeros(1, numlabels);
+    superpixelYMotionSTD = zeros(1, numlabels);
     
     for superPixelIdx = 1:numlabels
         
@@ -79,23 +83,38 @@ function [] = optFlow (I1,I2)
           
         meanXMotion = mean(xPart(neededPixels));
         meanYMotion = mean(yPart(neededPixels));
+        
+        STDXMotion = std(xPart(neededPixels));
+        STDYMotion = std(yPart(neededPixels));
          
         superpixelMeanX(superPixelIdx) = meanX;
         superpixelMeanY(superPixelIdx) = meanY;
         superpixelXMotion(superPixelIdx) = meanXMotion;
         superpixelYMotion(superPixelIdx) = meanYMotion;
-      
+        superpixelXMotionSTD(superPixelIdx) = STDXMotion;
+        superpixelYMotionSTD(superPixelIdx) = STDYMotion;
+        
       %%  quiver(floor(meanY), floor(meanX), meanXMotion*1000000, meanYMotion*1000000);
     end
     
     figure();
-    imshow(superpixelBoundaries);
-    title('Boundaries on first Image');
-    hold on
-   
+    hist(superpixelXMotionSTD);
     
+       figure();
+    hist(superpixelYMotionSTD);
+    
+    figure();
+    imshow(superpixelBoundaries);
+    title('Motion Vectors of SuperPixels');
+    hold on
     quiver(floor(superpixelMeanY), floor(superpixelMeanX), superpixelXMotion, superpixelYMotion);
     
+    
+    figure();
+    imshow(superpixelBoundaries);
+    title('STD of superpixels in X & Y directions');
+    hold on
+    quiver(floor(superpixelMeanY), floor(superpixelMeanX), superpixelXMotionSTD, superpixelYMotionSTD);
     
     % Quiver axis: (0,0) is top left corner
     % first argument is horizontal axis, increases from left to right
@@ -140,6 +159,10 @@ function [] = optFlow (I1,I2)
     imshow(superpixelBoundaries);
     title('many vectors');
     hold on;
+    %% First Component, starts frop top left and goes right (horizontal)
+    %% Second Component, starts from top left, and goes down (vertical)
     quiver(neededY, neededX,neededXMotion,neededYMotion);
+    
+    
     
 end

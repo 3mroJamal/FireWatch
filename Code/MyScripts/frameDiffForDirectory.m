@@ -1,3 +1,18 @@
+% For every triplet separately, compute the difference image, and then do
+% median filtering on diff image to remove noise, and dilation to enlarge
+% candidate regions and then extract super pixels according to some
+% filtering condition defined in frameDiffernceFilter (ex: 15% of 
+% brightest superpixels in diff image)
+
+%tripletsCount: number of triplets to consider, -1 considers all triplets
+%in the directory
+
+% Sample Command: 
+% frameDiffForDirectory('D:\FireWatch\SampleImagesRaw\confirmedGermany\confirmedGermanyTrainAll\', -1)
+
+
+% Remarks: performs resonably well on Barbara's dataset
+
 function [] = frameDiffForDirectory(dirPath, tripletsCount)
   dirInfo = dir(dirPath);
   
@@ -33,13 +48,48 @@ function [] = frameDiffForDirectory(dirPath, tripletsCount)
           imTwo = imread(fullfile(dirPath,imTwoName));
           
        
-          normalizedImage = uint8(normalizeImage(imZero).*255);
-          %figure();
-          %imshow(normalizedImage);
-          %title('Normalized Image');
+          imZeroNormalized = normalizeImage(imZero);
+          imOneNormalized = normalizeImage(imOne);
+          
+          imTwoNormalized = normalizeImage(imTwo);
+          
+          myDiff = abs(imOneNormalized - imZeroNormalized);
+          myDiffNormalized = normalizeImage(myDiff);
+          
+          figure();
+          imshow(myDiffNormalized);
+          title('myDiffNormalized');
+          
+          myDiffThresholded = myDiffNormalized;
+          myDiffThresholded(myDiffThresholded<0.5) = 0;
+          %%myDiffThresholded(myDiffThresholded>=0.3) = 1;
           
           
-          AdaptiveEqualizedImage = adapthisteq(normalizedImage);
+          figure();
+          imshow(myDiffThresholded);
+          title('Thresholding');
+         
+          
+          myDiffTwo = abs(imTwoNormalized - imOneNormalized);
+          myDiffTwoNormalized = normalizeImage(myDiffTwo);
+          
+          %%figure();
+          %%imshow(myDiffTwoNormalized);
+          %%title('myDiffTwoNormalized');
+          
+            diffAddition = myDiff + myDiffTwo;
+            diffAdditionNormalized = normalizeImage(diffAddition);
+            %%figure();
+            %%imshow(diffAdditionNormalized);
+            %%title('normalized diff addition');
+          
+          imZeroGrayscale = uint8(normalizeImage(imZero).*255);
+          %%figure();
+          %%imshow(imZeroGrayscale);
+          %%title('Normalized Image');
+          
+          
+          AdaptiveEqualizedImage = adapthisteq(imZeroGrayscale);
           figure();
           imshow(AdaptiveEqualizedImage);
           title('Adaptive Equalization');
@@ -48,16 +98,13 @@ function [] = frameDiffForDirectory(dirPath, tripletsCount)
            
           diffOne = frameDifference(imZero, imOne);
           diffTwo = frameDifference(imOne, imTwo);
-          
           diff = zeros(size(diffOne));
           diff(diffOne>=diffTwo) = diffOne(diffOne>=diffTwo);
           diff(diffTwo>diffOne) = diffTwo(diffTwo>diffOne);
           diff = uint8(diff);
-                    
-         
-          figure();
-          imshow(diff);
-          title('DIFF Image');
+          %% figure();
+          %% imshow(diff);
+          %% title('DIFF Image');
           
           saltAndPepperDiff = medfilt2(diff, [15 15]);          
           %%figure();
@@ -65,41 +112,40 @@ function [] = frameDiffForDirectory(dirPath, tripletsCount)
           %%title('Diff Salt and Pepper');
 
           dilatedDiff = imdilate(saltAndPepperDiff, ones(20));
+          %%figure();
+          %%imshow(dilatedDiff);
+          %%title('dilated image');
           
-          
-          figure();
-          imshow(dilatedDiff);
-          title('dilated image');
-          
+          %% superpixelNumber = 500;
+          %% compactnessFactor = 40;
          
+          %% [labelsAdaptive, numLabelsAdaptive] = SLICdemo(AdaptiveEqualizedImage, superpixelNumber, compactnessFactor);
+          %% binaryMaskAdaptive = drawregionboundaries(labelsAdaptive); 
+          %% maskedImageAdaptive = AdaptiveEqualizedImage;
+          %% maskedImageAdaptive(binaryMaskAdaptive==1) = 0;
           
-           [labelsAdaptive, numLabelsAdaptive] = SLICdemo(AdaptiveEqualizedImage, 500, 40);
-           binaryMaskAdaptive = drawregionboundaries(labelsAdaptive); 
-           maskedImageAdaptive = AdaptiveEqualizedImage;
-           maskedImageAdaptive(binaryMaskAdaptive==1) = 0;
-          
-           %figure();
-           %imshow(maskedImageAdaptive);
-           %title('maskedImageAdaptive');
+          %% figure();
+          %% imshow(maskedImageAdaptive);
+          %% title('maskedImageAdaptive');
           
           
           %% Super pixels of normalized image (No equalization) have more straight noundaries
-          [labelsNormalized, numLabelsNormalized] = SLICdemo(normalizedImage, 500, 40);
-          binaryMaskNormalized = drawregionboundaries(labelsNormalized);
-          maskedImageNormalized = AdaptiveEqualizedImage;
-          maskedImageNormalized(binaryMaskNormalized==1) = 0;
+          %% [labelsNormalized, numLabelsNormalized] = SLICdemo(imZeroGrayscale, superpixelNumber, compactnessFactor);
+          %% binaryMaskNormalized = drawregionboundaries(labelsNormalized);
+          %% maskedImageNormalized = AdaptiveEqualizedImage;
+          %% maskedImageNormalized(binaryMaskNormalized==1) = 0;
           
+          %% figure();
+          %% imshow(maskedImageNormalized);
+          %% title('maskedImageNormalized');
+          
+          %% filteredImageAdaptive = frameDifferenceFilter(imZeroGrayscale, AdaptiveEqualizedImage,  dilatedDiff, labelsAdaptive, numLabelsAdaptive, 0.1);
           %%figure();
-          %%imshow(maskedImageNormalized);
-          %%title('maskedImageNormalized');
-          
-          filteredImageAdaptive = frameDifferenceFilter(normalizedImage, AdaptiveEqualizedImage,  dilatedDiff, labelsAdaptive, numLabelsAdaptive, 0.1);
-          figure();
-          imshow(filteredImageAdaptive);
-          title('Filtered out image Apative');
+          %%imshow(filteredImageAdaptive);
+          %%title('Filtered out image Apative');
           
           
-          %%filteredImageNormalized = frameDifferenceFilter(normalizedImage, AdaptiveEqualizedImage,  dilatedDiff, labelsNormalized, numLabelsNormalized, 0.1);
+          %%filteredImageNormalized = frameDifferenceFilter(imZeroGrayscale, AdaptiveEqualizedImage,  dilatedDiff, labelsNormalized, numLabelsNormalized, 0.1);
           %%figure();
           %%imshow(filteredImageNormalized);
           %%title('Filtered out image Normalized');

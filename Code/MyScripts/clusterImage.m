@@ -26,9 +26,9 @@ function [] = clusterImage(Image, ImageTwo, useWhiteMask, clusterNumber, feature
     
     SuperpixelBoundaries =  drawSuperpixelBoundaries(grayscaleImage, Labels, useWhiteMask);
     
-    figure();
-    imshow(SuperpixelBoundaries);
-    title('Superpixels');
+    %%% figure();
+    %%% imshow(SuperpixelBoundaries);
+    %%% title('Superpixels');
 
     colorFeatureMatrix = extractFeatures(grayscaleImage, Labels, numLabels);
     
@@ -96,7 +96,6 @@ function [] = clusterImage(Image, ImageTwo, useWhiteMask, clusterNumber, feature
     for clusterIdx = 1:clusterNumber
         currentClusterImage = uint8(zeros(size(Image)));
         currentClusterImage(ClusterImage==clusterIdx) = grayscaleImage(ClusterImage==clusterIdx);
-        
         
         figure();
         imshow(currentClusterImage);

@@ -5,7 +5,6 @@
 function [featureMatrix] = extractDiffImageFeatures(imZero, imOne, imTwo, labels, numLabels )
     
      featureMatrix = zeros(1,numLabels);
-        
 
      diffOne = frameDifference(imZero, imOne);
      diffTwo = frameDifference(imOne, imTwo);
@@ -14,11 +13,10 @@ function [featureMatrix] = extractDiffImageFeatures(imZero, imOne, imTwo, labels
      diff(diffOne>=diffTwo) = diffOne(diffOne>=diffTwo);
      diff(diffTwo>diffOne) = diffTwo(diffTwo>diffOne);
      diff = uint8(diff);
-                    
-         
-     %%figure();
-     %%imshow(diff);
-     %%title('DIFF Image');
+                
+     %% figure();
+     %% imshow(diff);
+     %% title('DIFF Image');
           
      %% saltAndPepperDiff = medfilt2(diff, [15 15]);          
      %%figure();

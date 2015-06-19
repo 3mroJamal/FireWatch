@@ -1,0 +1,9 @@
+% returns hardcoded feature-names in a cell array. Whenver a new feature is
+% added, this function must be updated with the new feature name.
+
+function [featureNames] = getFeatureNames()
+    featureNames = {'Intensity Mean', 'Intensity STD', 'X-Position Of Superpixel', ...
+        'Y-Position Of Superpixel', 'Motion Mean in X direction', 'Motion STD in X Direction',...
+        'Motion Mean in Y Direction', 'Motion STD in Y Direction', 'Diff Image Intensity Mean',...
+        'Diff Image Intensity STD', 'relativeIntensityMean'};
+end
