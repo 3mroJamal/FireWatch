@@ -1,9 +1,9 @@
 % image: double image in range [0 1]
 % alpha: belnding factor (blendedImage = alpha*original + (1-alpha)*labelImage)
-% labelImage: image indincation to which cluster each pixel belongs
+% labelImage: image with the labels to which cluster each pixel belongs
 
 function [blendedImage] = alphaBelnding(image, alpha, labelImage)
-    colormap = [0 0 1; 0 1 0; 1 0 0; 0 1 1; 1 0 1; 1 1 0; 1 0.5 0; 0.6 0.3 0.3; 0.2 0.7 0.5; 1 1 1];
+    colormap = generateColorMap();
     
     %% image = normalizeImage(image);
     
@@ -21,7 +21,9 @@ function [blendedImage] = alphaBelnding(image, alpha, labelImage)
     labelImageGreen = zeros(rows, cols);
     labelImageBlue = zeros(rows, cols);
     
-    minLabel = min(min(labelImage));
+    % Sometimes a label zero is included (clusters to ignore), so we don't
+    % want the min label to be the minimum of the labelImage
+    minLabel = 1;
     maxLabel = max(max(labelImage));
     
     for labelIdx = minLabel:maxLabel
@@ -52,7 +54,6 @@ function [blendedImage] = alphaBelnding(image, alpha, labelImage)
     %% figure();
     %% imshow(blendedImage);
     %% title('Blended Image');
-    
     
     
     

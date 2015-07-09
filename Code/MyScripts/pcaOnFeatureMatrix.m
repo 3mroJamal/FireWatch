@@ -32,12 +32,13 @@ function [] = pcaOnFeatureMatrix(featureMatrix ,featureNames, clusterNumber, clu
     
     size(projectedFeaturesOnFirstPC)
     size(clusterLabels)
+    colorMap = generateColorMap();
     
     figure();
     for clusterIdx = 1:clusterNumber
         projectedFeaturesOnFirstPCInCluster = projectedFeaturesOnFirstPC(clusterLabels == clusterIdx);
         projectedFeaturesOnSecondPCInCluster = projectedFeaturesOnSecondPC(clusterLabels == clusterIdx);
-        scatter(projectedFeaturesOnFirstPCInCluster, projectedFeaturesOnSecondPCInCluster);
+        scatter(projectedFeaturesOnFirstPCInCluster, projectedFeaturesOnSecondPCInCluster, 25,colorMap(clusterIdx,:) );
         hold on;
     end
     xlabel('PC1');
@@ -53,6 +54,7 @@ function [] = pcaOnFeatureMatrix(featureMatrix ,featureNames, clusterNumber, clu
         dataAxes(i,i) = 1;
     end
     projectedAxis = coeffCut'*dataAxes;
+    
     for i = 1:numberOfFeatures
         hold on;
         quiver(0,0, projectedAxis(1,i) * 20, projectedAxis(2,i) * 20); 

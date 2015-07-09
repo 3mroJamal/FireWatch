@@ -12,6 +12,8 @@
 
 
 % Remarks: performs resonably well on Barbara's dataset
+% This is a preliminary script to extract the regions of interest in an
+% image
 
 function [] = frameDiffForDirectory(dirPath, tripletsCount)
   dirInfo = dir(dirPath);
@@ -47,12 +49,8 @@ function [] = frameDiffForDirectory(dirPath, tripletsCount)
           imOne = imread(fullfile(dirPath,imOneName));
           imTwo = imread(fullfile(dirPath,imTwoName));
           
-       
-          imZeroNormalized = normalizeImage(imZero);
-          imOneNormalized = normalizeImage(imOne);
-          
-          imTwoNormalized = normalizeImage(imTwo);
-          
+          [imZeroNormalized, imOneNormalized, imTwoNormalized] = normalizeImage(imZero, imOne, imTwo);
+                 
           myDiff = abs(imOneNormalized - imZeroNormalized);
           myDiffNormalized = normalizeImage(myDiff);
           

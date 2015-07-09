@@ -1,6 +1,6 @@
 % Perform a function on a directory of triplets
-% the function is perform on each triplet separately
-% function is hardcoded inside this function
+% the function is performed on each triplet separately
+% the function to be performed is hardcoded inside this function
 % TODO: allow this function to take the function to perform on each triplet
 % as input
 

@@ -1,3 +1,7 @@
+% Partitions an image into square blocks of "blockSize" instead of
+% superpixels
+% Can be used by the cluster directory script to cluster square blocks
+% instead of superpixels
 function [labels, numLabels] = slicBlocks(GrayScaleImage, blockSize)
     [rows, cols] = size(GrayScaleImage);
     superpixelIdx = 1;

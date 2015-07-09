@@ -1,22 +1,33 @@
-% Returned features
+% Extarct features based on the difference images between first and zeroth
+% images as well as second and first triplet images
+% Returns a feature matrix with teh 2 features
 % 1- mean of diff image intensity
 % 2- std of diff image intensity
 
-function [featureMatrix] = extractDiffImageFeatures(imZero, imOne, imTwo, labels, numLabels )
+function [featureMatrix] = extractDiffImageFeatures(normalizedImageZero, normalizedImageOne, labels, numLabels )
     
      featureMatrix = zeros(1,numLabels);
 
-     diffOne = frameDifference(imZero, imOne);
-     diffTwo = frameDifference(imOne, imTwo);
+     diffOne = frameDifference(normalizedImageZero, normalizedImageOne);
+     %% diffTwo = frameDifference(normalizedImageOne, normalizedImageTwo);
           
-     diff = zeros(size(diffOne));
-     diff(diffOne>=diffTwo) = diffOne(diffOne>=diffTwo);
-     diff(diffTwo>diffOne) = diffTwo(diffTwo>diffOne);
-     diff = uint8(diff);
-                
-     %% figure();
-     %% imshow(diff);
-     %% title('DIFF Image');
+     %% diff = zeros(size(diffOne));
+     %% diff(diffOne>=diffTwo) = diffOne(diffOne>=diffTwo);
+     %% diff(diffTwo>diffOne) = diffTwo(diffTwo>diffOne);
+     
+     diff = diffOne;
+     
+     %% diff = normalizeImage(diff);
+     
+     %% diff = uint8(diff);
+          
+     %%figure();
+     %%imshow(diff);
+     %%title('DIFF Image');
+     
+     %%figure();
+     %%imhist(diff);
+     %%title('diff hist');
           
      %% saltAndPepperDiff = medfilt2(diff, [15 15]);          
      %%figure();
@@ -34,6 +45,7 @@ function [featureMatrix] = extractDiffImageFeatures(imZero, imOne, imTwo, labels
          featureMatrix(1,superpixelIdx) = mean(diff(neededPixels));
          featureMatrix(2, superpixelIdx) = std(double(diff(neededPixels)));
      end
-    
+     
+   
     
 end

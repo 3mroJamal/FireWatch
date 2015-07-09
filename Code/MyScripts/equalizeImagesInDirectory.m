@@ -1,4 +1,4 @@
-% equalizeImagesInDirectory: normalizes Images in "srcDirectoryPath" to 
+% EqualizeImagesInDirectory: converts Images in "srcDirectoryPath" to 
 % grayscale [0,255] and then performs adaptive histogram equalization and
 % saves reulting images in "destinationDirectoryPath"
 % IMPORTANT FOR DATA VISUALIZATION

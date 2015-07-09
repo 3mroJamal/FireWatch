@@ -1,3 +1,4 @@
+% A script that tries the optical flow of matlab
 function [] = optFlow (I1,I2)
     
     if(size(I1,3)>1)

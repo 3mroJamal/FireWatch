@@ -1,4 +1,4 @@
-% perfomrs SLIC algorithm on color image
+% A trialScript that perfomrs SLIC algorithm on color image
 % used to verify that SLIC produces straight edges on homogenous images (not so many edges)
 % Command: 
 % I = imread('D:\trailImagesForSLIC\tomAndJerryHD.jpg');

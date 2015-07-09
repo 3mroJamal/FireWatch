@@ -1,9 +1,8 @@
 function [vx,vy] = demoflow(im1, im2)
 
 
-
-im1 = normalizeImage(im1);
-im2 = normalizeImage(im2);
+%%im1 = normalizeImage(im1);
+%%im2 = normalizeImage(im2);
 
 im1 = repmat(im1,1,1,3);
 im2 = repmat(im2,1,1,3);
@@ -89,7 +88,7 @@ neededXMotion = vx(randIndices);
 neededYMotion = vy(randIndices);
 
 figure();
-imshow(normalizeImage(rgb2gray(im1)));
+imshow((rgb2gray(im1)));
 hold on;
 quiver(neededY, neededX , neededXMotion, neededYMotion);
 
@@ -102,9 +101,6 @@ title('random vectors');
 %%figure();
 %%imhist(neededYMotion);
 %%title('Motion in Y');
-
-
-
 
 
 end

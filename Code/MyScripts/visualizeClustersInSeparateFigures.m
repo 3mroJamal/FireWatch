@@ -8,6 +8,8 @@
 % SuperPixelClusterIndices: Vector assiging each superpixel to a cluster
 % clusterNumber: number of clusters used
 
+% To be called from the clusterDirectory script
+
 function [] = visualizeClustersInSeparateFigures(imageDictionary, labelsDictionary, numLabelsDictionary, SuperPixelClusterIndices, clusterNumber)
 
 [imageCnt ~] = size(imageDictionary);

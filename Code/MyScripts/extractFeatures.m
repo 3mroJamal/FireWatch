@@ -1,28 +1,29 @@
-% returns the feature matrix of an image where each column corresponds to a
-% super pixel and each row correspond to a feature
+% Returns the feature matrix of an image where each column corresponds to a
+% superpixel and each row correspond to a feature
 % Feature Indices: 
 % 1) Mean Intensity
 % 2) Intensity SD
-% 3) Mean x position
-% 4) Mean y postion
+% 3) Mean X position (horizontal axis from left to right)
+% 4) Mean Y postion (vertical axis from top to bottom)
 
-function [featureMatrix] = extractFeatures(Image, Labels, NumLabels)
+function [featureMatrix] = extractFeatures(normalizedImage, Labels, NumLabels)
     featureMatrix = zeros(4, NumLabels);
     
-    [rows, columns] = size(Image);
+    [rows, columns] = size(normalizedImage);
     
     %% NormalizedGrayScaleImage = uint8(normalizeImage(Image).*255);
    
-    normalizedImage = normalizeImage(Image);
     %%figure();
     %%imhist(normalizedImage);
     %%title('Histogram Of Normalized Intensities');
     
+   
     
     for SuperPixelIdx = 1:NumLabels
         %% neededPixels = NormalizedGrayScaleImage(Labels == SuperPixelIdx);
         
         neededPixels = normalizedImage(Labels == SuperPixelIdx);
+        
         neededPixelsPositions = find(Labels == SuperPixelIdx);
         
         meanOfNeededPixels = mean(neededPixels);
@@ -32,15 +33,20 @@ function [featureMatrix] = extractFeatures(Image, Labels, NumLabels)
         stdOfNeededPixels = std(double(neededPixels));
         featureMatrix(2, SuperPixelIdx) = stdOfNeededPixels;
         
-        rowIdx = mod((neededPixelsPositions-1) ,rows) +1;
-        meanRow = mean(rowIdx);
-        featureMatrix(3, SuperPixelIdx) = meanRow;
-        
+        %% This is mean X position where x is a horizontal axis from left to right
         colIdx = floor((neededPixelsPositions+1)/rows);
         meanColumn = mean(colIdx);
-        featureMatrix(4, SuperPixelIdx) = meanColumn;
-     end
+        featureMatrix(3, SuperPixelIdx) = meanColumn;
         
+        %% This is mean Y where Y is a vertical axis from top to bottom
+        rowIdx = mod((neededPixelsPositions-1) ,rows) +1;
+        meanRow = mean(rowIdx);
+        featureMatrix(4, SuperPixelIdx) = meanRow;
+        
+        
+    end
+    
+
     end
     
     %% Part to visualize the computed means and cluster centers
